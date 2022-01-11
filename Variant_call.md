@@ -63,7 +63,7 @@ No geral as reads estão com uma qualidade boa, porém como pretendo procurar po
 * procurar por adptadores (o programa reconhece automaticamente);  
 * realizar um cut de 6pb na região 5' e 9pb na extremidade 3' das reads;  
 * filtrar reads menores 40pb;  
-* usar filtro paracqualidade maior que 30phred.  
+* usar filtro para qualidade maior que 30phred.  
 
 
 opções:  
