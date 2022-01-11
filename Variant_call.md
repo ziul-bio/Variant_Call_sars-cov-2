@@ -48,7 +48,7 @@ O controle de qualidade e o pré-processamento de arquivos FASTQ são essenciais
 fastqc fastq/*.fastq.gz
 ```
 
-![read_1](raw_fastq/r1_qc.png)
+![read_1](data/r1_qc.png)
 
 ### Limpeza das sequências com fastp
 
@@ -87,7 +87,7 @@ fastp -q 30 -l 40 -f 6 -F 6 -t 9 -T 9 -i raw_fastq/covid_patient_R1.fastq.gz -I 
 fastqc passedQC/passedQC/*.fastq
 ```
 
-![read_1](passedQC/r1_qc_after.png)
+![read_1](data/r1_qc_after.png)
 
 # Mapeamento dos reads no genoma de referência do SARS-CoV-2
 
@@ -274,7 +274,7 @@ Pode ser uma boa ideia, separa as posições do genoma com as snp, para fácil v
  bcftools view covid_patient.filtered.vcf | cut -f2,3,4,5 > snp.positions.txt
 ```
 
-![snp.igv](variants/snps_igv.png)
+![snp.igv](data/snps_igv.png)
 
 
 # Variant Annotation
@@ -344,16 +344,16 @@ Para uma verificação da exata linhagem, usar a applicação [PANGOLIN](https:/
 
 Algumas imagens do relatório summary.html provenientes do snpEpp
 
-![Tipo de variantes e efeitos](variants/snpeff_summary-1.png)
+![Tipo de variantes e efeitos](data/snpeff_summary-1.png)
 
 
-![Nº de efeitos por tipos e região](variants/snpeff_summary-2.png)
+![Nº de efeitos por tipos e região](data/snpeff_summary-2.png)
 
 
-![Codon changes](variants/snpeff_summary-3.png)
+![Codon changes](data/snpeff_summary-3.png)
 
 
-![Aminoacid changes](variants/snpeff_summary-4.png)
+![Aminoacid changes](data/snpeff_summary-4.png)
 
 
 ## Referências:
