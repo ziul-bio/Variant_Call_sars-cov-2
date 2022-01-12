@@ -331,7 +331,7 @@ output:
 	D614G  | S --> Sendo Asp alterada por Gly, na posição 614 da proteína S (spike glycoprotein)
 	V1176F | S --> Sendo Val alterada por Phe, na posição 1176 da proteína S (spike glycoprotein)
 
-![shared mutations](variants/covariant.png)
+![shared mutations](data/covariant.png)
 
 
 Com base nas mutações observadas alterações nos aminoácidos presentes nas posições 484, 614, 1176 que também estão
