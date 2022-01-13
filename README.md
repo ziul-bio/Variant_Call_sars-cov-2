@@ -32,7 +32,7 @@ de dados de Sequenciamento de Nova Geração (NGS). Nesta pipeline descrevo a de
 Muitas das variantes que surgiram no final de 2020 e início de 2021 compartilham mutações definidoras de aminoácidos. Algumas delas são mutações que interessam aos cientistas.  
 Em alguns casos, um grupo de variantes com alterações genéticas semelhantes podem ser designados como Variante de preocupação VOC (“variants of concern”) ou Variante de Interesse VOI (“variants of interest) devido as características compartilhadas, que podem exigir medidas de saúde pública.  
 
-Com isso, um trabalho bastante importante é a vigilância e busca por variações nos genomas sequenciados de SARS-CoV-2. Por isso, para quem tiver interesse, compartilho com vocês uma pipeline de “Variant Call” de amostras sequenciadas da covid19. Nela busco por variações no genoma, que indiquem possíveis alterações dos aminoácidos em proteínas do virais.
+Com isso, um trabalho bastante importante é a vigilância e busca por variações nos genomas sequenciados de SARS-CoV-2. Por isso, para quem tiver interesse, compartilho com vocês uma pipeline de [“Variant Call”](https://github.com/ziul-bio/Variant_call/blob/main/VariantCall.md) de amostras sequenciadas da covid19. Nela busco por variações no genoma, que indiquem possíveis alterações dos aminoácidos em proteínas do virais.
 
 ### Definições:
 
