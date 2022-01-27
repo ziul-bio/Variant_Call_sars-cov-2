@@ -1,4 +1,4 @@
-# Variant calling
+# Variant calling em amostras sequenciadas de pacientes com COVID19
 
 A chamada de variantes envolve a identificação de polimorfismos de nucleotídeo único (SNPs) e pequenas inserções e deleções (indels) 
 de dados de Sequenciamento de Nova Geração (NSG). Nesta pipeline descrevo a detecção de SNP para identificação possíveis variantes do vírus SARS-CoV-2.
@@ -284,7 +284,7 @@ Ele anota e prevê os efeitos de variantes genéticas (como alterações de amin
 
 ```bash
 cd variants/
-snpEff -v -classic NC_045512.2 covid_patient.cutted.vcf > covid_patient.snpEff.vcf
+snpEff -v -classic NC_045512.2 covid_patient.filtered.vcf > covid_patient.snpEff.vcf
 ```
 
 ### Os Outputs do snpEff
@@ -304,7 +304,7 @@ As informações sobre os efeitos dos SNPs são adicionadas usando a tag 'EFF'
 No campo EFF, os subcampos Amino_Acid_Change(11) e ganeId(5) são os que precisamos para identificar as alterações nos aminoácidos.
 Esta informação é necessária para compararmos com a tabela de share mutation no site CoVariants.
 
-Obs: caso não tivessemos usado o parâmetro -classic, estas informações estariam em outro subcampo. Ver manual. [link](https://pcingola.github.io/SnpEff/se_inputoutput/)
+Obs: caso não tivessemos usado o parâmetro -classic, estas informações estariam em outro subcampo. Ver [manual](https://pcingola.github.io/SnpEff/se_inputoutput/).
 
 
 ### Selecionado os campos de interesse
@@ -334,13 +334,80 @@ output:
 ![shared mutations](data/covariant.png)
 
 
-Com base nas mutações observadas alterações nos aminoácidos presentes nas posições 484, 614, 1176 que também estão
-presentes na variante (Gamma, V3) (P.1).
+Tudo indica que, com base nas alterações dos aminoácidos observados, se trata da variante P.1 (Gamma, V3).
 
-Para uma verificação da exata linhagem, usar a applicação [PANGOLIN](https://cov-lineages.org/resources/pangolin.html) (Phylogenetic Assignment of Named Global Outbreak Lineages).
+Note: P.1 é um alias da variante B.1.1.28.1, isso porque apenas três subníveis são permitidos pelo sistema de nomenclatura "PANGO Lineage",
+com isso, as linhagens B.1.1.28.1 e B.1.1.28.2, são denominadas de P.1 e P.2 respectivamente[[7](https://cov-lineages.org/lineage.html?lineage=B.1.1.28), [11](https://www.nature.com/articles/s41564-020-0770-5)]. 
 
 
-# Material complementar
+## Verificação exata da linhagem com bcftools consensus e PANGOLIN
+
+Para uma verificação da exata linhagem, usaremos a applicação [PANGOLIN](https://cov-lineages.org/resources/pangolin.html) (Phylogenetic Assignment of Named Global Outbreak Lineages).
+
+Mas para isso, é necessário um arquivo fasta com a sequncia da qual se deseja verificar a linhagem viral.
+
+Para isso, usarei o bcftools consensus, do qual aplica por padrão todas as variantes alteradas (ALT) armazenadas no arquivo vcf e as implementa no genoma de 
+referência presente no arquivo fasta. 
+
+
+Usage:
+```bash
+bcftools consensus [OPTIONS] <file.vcf.gz>
+
+# O arquivo vcf precisa estar compactado indexado
+
+# Compactando com bgzip, uma utilidade do bcftools.
+bgzip -c covid_patient.filtered.vcf > covid_patient.filtered.vcf.gz
+
+# Indexando o arquivo vcf
+bcftools index covid_patient.filtered.vcf.gz
+
+# Aplicando as variantes alteradas ao arquivo fasta de referência e gerando uma sequência consensus
+bcftools consensus -f ref_genome/covid_genome.fa -o covid_genome_consensus.fa covid_patient.filtered.vcf.gz
+```
+
+Bom agora com a sequência consensus, basta realizar uma atribuição de linhagem usando a [aplicação web do PANGOLIN](https://pangolin.cog-uk.io/).
+Esta aplicação usa o algoritmo denominado pangoLEARN, um algoritmo alternativo para atribuição de linhagem, que usa aprendizado de máquina.
+Este modelo foi construído com o algoritmo de aprendizado "Descision Tree" da biblioteca "scikit learn" e treinado com ~60,000 sequências 
+de SARS-CoV-2 disponibilizadas pelo GISAID[[9](https://cov-lineages.org/resources/pangolin/pangolearn.html)].
+
+## Resultados e Discussão
+
+Como resultado da atribuição de linhagem somados com as mutações observadas pela anotação com snpEff, podemos comcluir que a amostra sequenciada, 
+pertence a variante gama, da linhagem B.1.1.28.
+
+![results_pangolin](data/results_pangolin.png)
+
+A variante Gamma (P.1) é uma das variantes de Preocupação (VOC) do SARS-CoV-2, o vírus que causa o COVID-19[12](https://www.who.int/en/activities/tracking-SARS-CoV-2-variants/). 
+Essa variante do SARS-CoV-2 foi denominada linhagem P.1 e possui várias mutações de importância biológica como: N501Y, E484K e K417T[13](https://virological.org/t/genomic-characterisation-of-an-emergent-sars-cov-2-lineage-in-manaus-preliminary-findings/586),
+sendo a mutação E484k na proteína S de importância imunológica, por estar associada com a evasão do vírus à anticorpos neutralizantes[14](https://www.preprints.org/manuscript/202101.0132/v1).
+
+
+![Muttation in aminoacid of gamma variant](data/SARS-CoV-2_Gamma_variant.png)
+Mutações em aminoácidos da variante gama em um mapa do genoma do SARS-CoV-2, focando na proteína Spike.[15](https://covdb.stanford.edu/page/mutation-viewer/#gamma)
+
+
+## Referências:
+
+1 - https://learn.gencore.bio.nyu.edu/variant-calling/  
+2 - https://wikis.utexas.edu/display/bioiteam/Variant+calling+using+SAMtools  
+3 - https://hbctraining.github.io/In-depth-NGS-Data-Analysis-Course/sessionVI/lessons/02_variant-calling.html  
+4 - https://hbctraining.github.io/In-depth-NGS-Data-Analysis-Course/sessionVI/lessons/03_annotation-snpeff.html  
+5 - https://datacarpentry.org/wrangling-genomics/04-variant_calling/index.html  
+6 - https://covariants.org/shared-mutations
+7 - https://cov-lineages.org/resources/pangolin.html
+8 - https://pangolin.cog-uk.io/
+9 - https://cov-lineages.org/resources/pangolin/pangolearn.html
+10- https://cov-lineages.org/lineage.html?lineage=B.1.1.28
+11- https://www.nature.com/articles/s41564-020-0770-5
+12- https://www.who.int/en/activities/tracking-SARS-CoV-2-variants/
+13- https://virological.org/t/genomic-characterisation-of-an-emergent-sars-cov-2-lineage-in-manaus-preliminary-findings/586
+14- https://www.preprints.org/manuscript/202101.0132/v1
+15- https://covdb.stanford.edu/page/mutation-viewer/#gamma
+
+
+
+## Material complementar
 
 Algumas imagens do relatório summary.html provenientes do snpEpp
 
@@ -356,14 +423,7 @@ Algumas imagens do relatório summary.html provenientes do snpEpp
 ![Aminoacid changes](data/snpeff_summary-4.png)
 
 
-## Referências:
-
-https://learn.gencore.bio.nyu.edu/variant-calling/  
-https://wikis.utexas.edu/display/bioiteam/Variant+calling+using+SAMtools  
-https://hbctraining.github.io/In-depth-NGS-Data-Analysis-Course/sessionVI/lessons/02_variant-calling.html  
-https://hbctraining.github.io/In-depth-NGS-Data-Analysis-Course/sessionVI/lessons/03_annotation-snpeff.html  
-https://datacarpentry.org/wrangling-genomics/04-variant_calling/index.html  
-
+## Link das ferramentas usadas
 
 Softwares:  
 [fastqc](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/)  
